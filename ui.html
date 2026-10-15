@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; height: 100%; background: #202020; font-family: "Segoe UI", Tahoma, sans-serif;
+               user-select: none; -webkit-user-select: none; }
+  .window { width: 100%; height: 100%; background: #202020; position: relative;
+            display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+  .titlebar { position: absolute; top: 0; left: 0; right: 0; height: 36px; z-index: 10;
+              display: flex; justify-content: flex-end; align-items: center; gap: 4px; padding: 0 8px; }
+  .titlebar button { width: 28px; height: 24px; border: 0; border-radius: 4px; background: transparent;
+                     color: #ABABAB; font-size: 13px; cursor: pointer; }
+  .titlebar button:hover { background: #2D2D2D; color: #FFFFFF; }
+  #btnClose:hover { background: #C42B1C; }
+
+  .logoWrap { height: 190px; margin-bottom: 50px; display: flex; align-items: center; justify-content: center; }
+  .logo { height: 190px; max-width: 420px; object-fit: contain; display: block; }
+
+  .bottom { position: absolute; left: 40px; right: 40px; bottom: 40px; }
+  .line1 { color: #ABABAB; font-size: 12px; font-weight: 700; text-transform: uppercase;
+           letter-spacing: .3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .status { height: 18px; margin: 8px 0; display: flex; align-items: center; }
+  .progress { flex: 1; height: 6px; border-radius: 3px; background: #090A09; overflow: hidden; }
+  .progress > i { display: block; height: 100%; width: 0%; background: #FFFFFF;
+                  border-radius: 3px; transition: width .3s ease; }
+
+  .dots { display: none; position: relative; flex: 1; height: 6px; }
+  .dots.on { display: block; }
+  .dots i { position: absolute; top: 1px; left: 0; width: 4px; height: 4px;
+            border-radius: 50%; background: #FFFFFF; opacity: 0; will-change: transform; }
+
+  .line2 { color: #ABABAB; font-size: 10px; font-weight: 700;
+           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+  <div class="window">
+    <div class="titlebar" id="titlebar">
+      <button id="btnMin" title="Minimalizuj">&#8211;</button>
+      <button id="btnClose" title="Zamknij">&#10005;</button>
+    </div>
+
+    <div class="logoWrap">
+      <img class="logo" id="logo" src="https://wantedrp.pl/assets/w.png" alt="">
+    </div>
+
+    <div class="bottom">
+      <div class="line1" id="line1">Łączenie z serwerem...</div>
+      <div class="status">
+        <div class="progress" id="progress"><i id="bar"></i></div>
+        <div class="dots" id="dots"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="line2" id="line2">Ustawianie kanału</div>
+    </div>
+  </div>
+
+  <script>
+    function send(msg) { window.chrome.webview.postMessage(msg); }
+
+    function setStatus(a, b) {
+      if (a != null) document.getElementById('line1').textContent = a;
+      if (b != null) document.getElementById('line2').textContent = b;
+    }
+
+    function setProgress(p) {
+      p = Math.max(0, Math.min(100, p));
+      document.getElementById('bar').style.width = p + '%';
+    }
+
+    var dotsEl = document.getElementById('dots');
+    var dotNodes = dotsEl.querySelectorAll('i');
+    var DUR = 2800, STEP = 250, GAP = 700;
+    var PERIOD = DUR + STEP * (dotNodes.length - 1) + GAP;
+    var raf = 0, t0 = 0;
+
+    function curve(u) {
+      var s = 2 * u - 1;
+      return 0.5 + 0.5 * (0.15 * s + 0.85 * s * s * s);
+    }
+
+    function frame(now) {
+      var w = dotsEl.clientWidth - 4;
+      var t = now - t0;
+      for (var i = 0; i < dotNodes.length; i++) {
+        var local = (((t - i * STEP) % PERIOD) + PERIOD) % PERIOD;
+        var u = local / DUR;
+        var d = dotNodes[i];
+        if (u > 1) { d.style.opacity = 0; continue; }
+        d.style.opacity = Math.min(1, u / 0.05, (1 - u) / 0.05);
+        d.style.transform = 'translateX(' + (curve(u) * w) + 'px)';
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    function setLoading(on) {
+      on = !!on;
+      dotsEl.classList.toggle('on', on);
+      document.getElementById('progress').style.display = on ? 'none' : '';
+      cancelAnimationFrame(raf);
+      if (on) { t0 = performance.now(); raf = requestAnimationFrame(frame); }
+    }
+
+    document.getElementById('titlebar').addEventListener('mousedown', function (e) {
+      if (e.button === 0 && e.target === this) send('drag');
+    });
+    document.getElementById('btnMin').onclick = function () { send('minimize'); };
+    document.getElementById('btnClose').onclick = function () { send('close'); };
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') send('close');
+    });
+  </script>
+</body>
+</html>

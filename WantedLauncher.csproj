@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWindowsForms>true</UseWindowsForms>
+		<Company>WantedRP</Company>
+		<Authors>WantedRP</Authors>
+		<Description>Launcher WantedRP</Description>
+		<Version>1.0.0</Version>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+		<RootNamespace>WantedLauncher</RootNamespace>
+		<ApplicationIcon>app.ico</ApplicationIcon>
+
+		<AssemblyName>WantedRP Launcher (DEV)</AssemblyName>
+		<AssemblyTitle>WantedRP Launcher (DEV)</AssemblyTitle>
+		<Product>WantedRP Launcher (DEV)</Product>
+
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+
+		<AllowedReferenceRelatedFileExtensions>none</AllowedReferenceRelatedFileExtensions>
+
+		<Configurations>Debug;Release;Creative</Configurations>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<AssemblyName>WantedRP Launcher</AssemblyName>
+		<AssemblyTitle>WantedRP Launcher</AssemblyTitle>
+		<Product>WantedRP Launcher</Product>
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Creative'">
+		<AssemblyName>WantedRP Launcher (CREATIVE)</AssemblyName>
+		<AssemblyTitle>WantedRP Launcher (CREATIVE)</AssemblyTitle>
+		<Product>WantedRP Launcher (CREATIVE)</Product>
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="ui.html" LogicalName="ui.html" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="ui.html" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Never" />
+	</ItemGroup>
+
+</Project>

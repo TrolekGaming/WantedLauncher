@@ -1,0 +1,9 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Release" />
+    <BuildType Name="Creative" />
+    <Platform Name="Any CPU" />
+  </Configurations>
+  <Project Path="WantedLauncher.csproj" />
+</Solution>
